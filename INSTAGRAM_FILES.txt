@@ -1,0 +1,17 @@
+# Instagram Carousel Files Manifest
+
+This file lists all Instagram-specific files for the carousel feature.
+
+## Version: 1.0.0
+
+## Blocks
+blocks/instagram-post-card.liquid
+blocks/instagram-post-image.liquid
+blocks/instagram-post-caption.liquid
+blocks/instagram-post-meta.liquid
+
+## Sections
+sections/instagram-carousel.liquid
+
+## Dependencies
+None - Self-contained feature

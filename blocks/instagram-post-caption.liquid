@@ -1,0 +1,82 @@
+{% assign post = closest.metaobject['instagram-post'] %}
+
+{% liquid
+  if post == blank
+    assign display_caption = 'This is a sample Instagram post caption that will appear here.'
+  else
+    assign display_caption = post.caption.value
+  endif
+%}
+
+<div
+  class="instagram-post-caption"
+  data-block-id="{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  {% if display_caption != blank %}
+    <p
+      class="instagram-post-caption__text"
+      style="
+        font-size: {{ block.settings.font_size }}px;
+        {% if block.settings.max_lines > 0 %}
+          display: -webkit-box;
+          -webkit-line-clamp: {{ block.settings.max_lines }};
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        {% endif %}
+      "
+    >
+      {{ display_caption }}
+    </p>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .instagram-post-caption {
+    margin: 0;
+  }
+
+  .instagram-post-caption__text {
+    margin: 0;
+    line-height: 1.5;
+    color: var(--color-foreground, #000);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Instagram Post Caption",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Displays caption from parent Instagram post"
+    },
+    {
+      "type": "header",
+      "content": "Text Settings"
+    },
+    {
+      "type": "range",
+      "id": "max_lines",
+      "label": "Maximum Lines",
+      "info": "Limit caption to specific number of lines (0 = unlimited)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    }
+  ]
+}
+{% endschema %}

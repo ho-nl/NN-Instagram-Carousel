@@ -1,0 +1,178 @@
+{% assign post = closest.metaobject['instagram-post'] %}
+
+{% liquid
+  assign onboarding = false
+
+  if post == blank
+    assign onboarding = true
+  endif
+%}
+
+<div
+  class="instagram-post-card spacing-style"
+  data-block-id="{{ block.id }}"
+  data-testid="instagram-post-card"
+  {% if onboarding %}
+    data-placeholder="true"
+  {% endif %}
+  style="
+    {%- render 'spacing-style', settings: block.settings -%}
+    --text-align: {{ block.settings.alignment }};
+    --horizontal-alignment: {{ block.settings.alignment }};
+    --gap: {{ block.settings.gap }}px;
+    border-radius: {{ block.settings.border_radius }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="instagram-post-card__inner">
+    {%- content_for 'blocks' -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .instagram-post-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .instagram-post-card__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+  }
+
+  /* Push meta block to bottom */
+  .instagram-post-card__inner > *:last-child {
+    margin-top: auto;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Instagram Post Card",
+  "blocks": [
+    {
+      "type": "instagram-post-image"
+    },
+    {
+      "type": "instagram-post-caption"
+    },
+    {
+      "type": "instagram-post-meta"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "spacer"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "group"
+    }
+  ],
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Displays Instagram post from parent section"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

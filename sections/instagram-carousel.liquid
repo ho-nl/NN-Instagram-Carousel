@@ -1,0 +1,441 @@
+{% liquid
+  assign instagram_list = section.settings.instagram_list
+  assign posts = null
+  assign max_items = section.settings.post_limit
+
+  if instagram_list != blank
+    for list_item in instagram_list
+      assign posts = list_item.posts.value
+      break
+    endfor
+  endif
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+
+<div
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    section-resource-list
+    spacing-style
+    gap-style
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    {% render 'gap-style', value: section.settings.gap %}
+  "
+>
+  <div class="section-resource-list__content">
+    {%- content_for 'blocks' -%}
+  </div>
+
+  {% if posts == blank %}
+    {% comment %} Create placeholder posts for theme editor {% endcomment %}
+    {% assign posts = '' %}
+    {% for i in (1..max_items) %}
+      {% assign posts = posts | append: ', ' %}
+    {% endfor %}
+    {% assign posts = posts | split: ',' %}
+  {% endif %}
+
+  {% capture list_items %}
+    {% for post in posts limit: max_items %}
+      <div class="resource-list__item">
+        {% content_for 'block', 
+          id: 'static-instagram-post-card', 
+          type: 'instagram-post-card', 
+          closest.metaobject.instagram-post: post
+        %}
+      </div>
+      {% unless forloop.last %}
+        <!--@list/split-->
+      {% endunless %}
+    {% endfor %}
+  {% endcapture %}
+
+  {% liquid
+    assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+  %}
+
+  {% render 'resource-list',
+    list_items: list_items,
+    list_items_array: list_items_array,
+    settings: section.settings,
+    carousel_ref: 'instagramCarousel',
+    slide_count: max_items,
+    content_type: 'instagram-posts',
+    test_id: 'instagram-carousel-list'
+  %}
+</div>
+
+{% schema %}
+{
+  "name": "Instagram Carousel",
+  "tag": "section",
+  "class": "instagram-carousel",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "instagram-post-card"
+    },
+    {
+      "type": "instagram-post-image"
+    },
+    {
+      "type": "instagram-post-caption"
+    },
+    {
+      "type": "instagram-post-meta"
+    },
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "video"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "spacer"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "metaobject_list",
+      "id": "instagram_list",
+      "label": "Instagram List",
+      "metaobject_type": "instagram-list"
+    },
+    {
+      "type": "header",
+      "content": "t:content.cards_layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "t:settings.layout_type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "t:options.carousel"
+        }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_on_mobile",
+      "label": "t:settings.carousel_on_mobile",
+      "default": true,
+      "visible_if": "{{ section.settings.layout_type != 'carousel' }}"
+    },
+    {
+      "type": "range",
+      "id": "post_limit",
+      "label": "Post Count",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "t:settings.columns",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "visible_if": "{{ section.settings.layout_type == 'grid' or section.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "t:settings.mobile_columns",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:options.one_number"
+        },
+        {
+          "value": "2",
+          "label": "t:options.two_number"
+        }
+      ],
+      "default": "2",
+      "visible_if": "{{ section.settings.layout_type == 'grid' and section.settings.carousel_on_mobile == false }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_card_size",
+      "label": "t:settings.mobile_columns",
+      "options": [
+        {
+          "value": "60cqw",
+          "label": "t:options.one_number"
+        },
+        {
+          "value": "44cqw",
+          "label": "t:options.two_number"
+        }
+      ],
+      "default": "44cqw",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "range",
+      "id": "columns_gap",
+      "label": "t:settings.horizontal_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8,
+      "visible_if": "{{ section.settings.layout_type == 'grid' or section.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "label": "t:settings.vertical_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8,
+      "visible_if": "{{ section.settings.layout_type == 'grid'}}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.carousel_navigation",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "t:settings.icon",
+      "options": [
+        {
+          "value": "arrow",
+          "label": "t:options.arrows"
+        },
+        {
+          "value": "chevron",
+          "label": "t:options.chevrons"
+        },
+        {
+          "value": "arrows_large",
+          "label": "t:options.arrows_large"
+        },
+        {
+          "value": "chevron_large",
+          "label": "t:options.chevron_large"
+        },
+        {
+          "value": "none",
+          "label": "t:options.none"
+        }
+      ],
+      "default": "arrow",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_shape",
+      "label": "t:settings.icon_background",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "circle",
+          "label": "t:options.circle"
+        },
+        {
+          "value": "square",
+          "label": "t:options.square"
+        }
+      ],
+      "default": "circle",
+      "visible_if": "{{ section.settings.icons_style != 'none' and section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram Carousel",
+      "category": "Custom",
+      "blocks": {
+        "static-instagram-post-card": {
+          "type": "instagram-post-card",
+          "name": "Instagram Post Card",
+          "static": true,
+          "blocks": {
+            "image": {
+              "type": "instagram-post-image"
+            },
+            "caption": {
+              "type": "instagram-post-caption"
+            },
+            "meta": {
+              "type": "instagram-post-meta"
+            }
+          },
+          "block_order": ["image", "caption", "meta"]
+        }
+      },
+      "settings": {
+        "columns_gap": 16,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  /* Center carousel navigation on the image, not the whole card */
+  .instagram-carousel .resource-list__carousel {
+    position: relative;
+  }
+
+  .instagram-carousel .resource-list__carousel slideshow-arrows {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: var(--util-page-margin-offset);
+    height: var(--instagram-image-height, 400px);
+  }
+
+  .instagram-carousel .resource-list__carousel slideshow-arrows button {
+    pointer-events: auto;
+  }
+</style>
+
+<script>
+  // Set arrow height to match image height
+  (function() {
+    function updateArrowPosition() {
+      const carousel = document.querySelector('.instagram-carousel .resource-list__carousel');
+      if (!carousel) return;
+
+      const firstImage = carousel.querySelector('.instagram-post-image');
+      if (!firstImage) return;
+
+      const imageHeight = firstImage.offsetHeight;
+      carousel.style.setProperty('--instagram-image-height', `${imageHeight}px`);
+    }
+
+    // Update on load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateArrowPosition);
+    } else {
+      updateArrowPosition();
+    }
+
+    // Update on resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateArrowPosition, 100);
+    });
+
+    // Update in theme editor
+    if (window.Shopify && window.Shopify.designMode) {
+      document.addEventListener('shopify:section:load', updateArrowPosition);
+    }
+  })();
+</script>

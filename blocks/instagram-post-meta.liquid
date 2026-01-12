@@ -1,0 +1,146 @@
+{% assign post = closest.metaobject['instagram-post'] %}
+
+{% liquid
+  if post == blank
+    assign display_likes = 1234
+    assign display_comments = 56
+  else
+    assign display_likes = post.likes.value
+    assign display_comments = post.comments.value
+  endif
+%}
+
+<div
+  class="instagram-post-meta"
+  data-block-id="{{ block.id }}"
+  {{ block.shopify_attributes }}
+  style="--gap: {{ block.settings.gap }}px;"
+>
+  {% if block.settings.show_likes and display_likes != blank %}
+    <span class="instagram-post-meta__likes">
+      {% case block.settings.icon_style %}
+        {% when 'filled' %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        {% when 'outline' %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        {% when 'rounded' %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+          </svg>
+        {% when 'emoji' %}
+          ❤️
+      {% endcase %}
+      {{ display_likes }}
+    </span>
+  {% endif %}
+
+  {% if block.settings.show_comments and display_comments != blank %}
+    <span class="instagram-post-meta__comments">
+      {% case block.settings.icon_style %}
+        {% when 'filled' %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          </svg>
+        {% when 'outline' %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        {% when 'rounded' %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+          </svg>
+        {% when 'emoji' %}
+          💬
+      {% endcase %}
+      {{ display_comments }}
+    </span>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .instagram-post-meta {
+    display: flex;
+    gap: var(--gap, 1rem);
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--color-foreground-secondary, #666);
+  }
+
+  .instagram-post-meta__likes,
+  .instagram-post-meta__comments {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .instagram-post-meta svg {
+    flex-shrink: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Instagram Post Meta",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Displays likes and comments count from parent Instagram post"
+    },
+    {
+      "type": "header",
+      "content": "Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_likes",
+      "label": "Show Likes",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_comments",
+      "label": "Show Comments",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icon Style",
+      "options": [
+        {
+          "value": "filled",
+          "label": "Filled"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        },
+        {
+          "value": "rounded",
+          "label": "Rounded"
+        },
+        {
+          "value": "emoji",
+          "label": "Emoji"
+        }
+      ],
+      "default": "filled"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap Between Items",
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    }
+  ]
+}
+{% endschema %}
