@@ -17,6 +17,8 @@
   # Get overlay settings from this block
   assign show_overlay = block.settings.overlay_content
   assign overlay_opacity = block.settings.overlay_opacity | divided_by: 100.0
+  assign overlay_info = block.settings.overlay_info
+  assign caption_max_lines = block.settings.caption_max_lines
 %}
 
 <div
@@ -58,14 +60,37 @@
       class="instagram-post-image__overlay-link"
       aria-label="View on Instagram"
     >
-      <svg
-        class="instagram-post-image__overlay-icon"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153.509.5.902 1.105 1.153 1.772.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122s-.01 3.056-.06 4.122c-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 01-1.153 1.772c-.5.508-1.105.902-1.772 1.153-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06s-3.056-.01-4.122-.06c-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 01-1.772-1.153 4.904 4.904 0 01-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12s.01-3.056.06-4.122c.05-1.066.217-1.79.465-2.428a4.88 4.88 0 011.153-1.772A4.897 4.897 0 015.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm6.5-.25a1.25 1.25 0 10-2.5 0 1.25 1.25 0 002.5 0zM12 9a3 3 0 110 6 3 3 0 010-6z"/>
-      </svg>
+      <div class="instagram-post-image__overlay-content">
+        <svg width="48px" height="48px" fill="#ffffffff" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="2"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><title></title><path d="M44,57H20A13,13,0,0,1,7,44V20A13,13,0,0,1,20,7H44A13,13,0,0,1,57,20V44A13,13,0,0,1,44,57ZM20,9A11,11,0,0,0,9,20V44A11,11,0,0,0,20,55H44A11,11,0,0,0,55,44V20A11,11,0,0,0,44,9Z"></path><path d="M32,43.67A11.67,11.67,0,1,1,43.67,32,11.68,11.68,0,0,1,32,43.67Zm0-21.33A9.67,9.67,0,1,0,41.67,32,9.68,9.68,0,0,0,32,22.33Z"></path><path d="M44.5,21A3.5,3.5,0,1,1,48,17.5,3.5,3.5,0,0,1,44.5,21Zm0-5A1.5,1.5,0,1,0,46,17.5,1.5,1.5,0,0,0,44.5,16Z"></path></g>
+        </svg>
+        
+        {% if overlay_info == 'caption' and post.caption.value != blank %}
+          <p class="instagram-post-image__overlay-caption" style="-webkit-line-clamp: {{ caption_max_lines }}; line-clamp: {{ caption_max_lines }};">
+            {{ post.caption.value }}
+          </p>
+        {% elsif overlay_info == 'likes' %}
+          <div class="instagram-post-image__overlay-meta">
+            {% if post.likes.value != blank %}
+              <span class="instagram-post-image__overlay-likes">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                {{ post.likes.value }}
+              </span>
+            {% endif %}
+            
+            {% if post.comments.value != blank %}
+              <span class="instagram-post-image__overlay-comments">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+                {{ post.comments.value }}
+              </span>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
     </a>
   {% endif %}
 </div>
@@ -120,17 +145,55 @@
     pointer-events: auto;
   }
 
-  .instagram-post-image__overlay-icon {
-    width: 64px;
-    height: 64px;
-    fill: white;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
-    transition: transform 0.2s ease;
-    position: relative;
-    z-index: 3;
+  .instagram-post-image__overlay-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    max-width: 90%;
+    text-align: center;
   }
 
-  .instagram-post-image__overlay-link:hover .instagram-post-image__overlay-icon {
+  .instagram-post-image__overlay-content svg {
+    flex-shrink: 0;
+  }
+
+  .instagram-post-image__overlay-caption {
+    color: white;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+  }
+
+  .instagram-post-image__overlay-meta {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .instagram-post-image__overlay-likes,
+  .instagram-post-image__overlay-comments {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .instagram-post-image__overlay-meta svg {
+    flex-shrink: 0;
+  }
+
+  .instagram-post-image__overlay-link:hover .instagram-post-image__overlay-content svg {
     transform: scale(1.1);
   }
 
@@ -268,6 +331,37 @@
       "step": 5,
       "unit": "%",
       "default": 50
+    },
+    {
+      "type": "select",
+      "id": "overlay_info",
+      "label": "Overlay information",
+      "options": [
+        {
+          "value": "none",
+          "label": "Icon only"
+        },
+        {
+          "value": "caption",
+          "label": "Icon + Caption"
+        },
+        {
+          "value": "likes",
+          "label": "Icon + Likes/Comments"
+        }
+      ],
+      "default": "none",
+      "info": "Choose what information to display in the overlay"
+    },
+    {
+      "type": "range",
+      "id": "caption_max_lines",
+      "label": "Caption max lines",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3,
+      "info": "Maximum number of lines to show for the caption"
     }
   ]
 }
