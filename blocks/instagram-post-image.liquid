@@ -1,5 +1,5 @@
-{% assign post = closest.metaobject['instagram-post'] %}
-{% assign instagram_list = metaobjects['instagram-list']['instagram-feed-list'] %}
+{% assign post = closest.metaobject['nn_instagram_post'] %}
+{% assign instagram_list = metaobjects['nn_instagram_list']['instagram-feed-list'] %}
 
 {% liquid
   assign onboarding = false
@@ -9,7 +9,7 @@
     assign onboarding = true
   endif
 
-  # Get username from the instagram-list metaobject
+  # Get username from the nn_instagram_list metaobject
   if instagram_list.username != blank
     assign instagram_username = instagram_list.username
   endif
