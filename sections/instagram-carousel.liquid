@@ -4,7 +4,10 @@
   assign max_items = section.settings.post_limit
 
   if instagram_list != blank
-    assign posts = instagram_list.posts.value
+    for list_item in instagram_list
+      assign posts = list_item.posts.value
+      break
+    endfor
   endif
 %}
 
@@ -43,7 +46,7 @@
         {% content_for 'block', 
           id: 'static-instagram-post-card', 
           type: 'instagram-post-card', 
-          closest.metaobject.app--279678910465--nn_instagram_post: post
+          closest.metaobject.nn_instagram_post: post
         %}
       </div>
       {% unless forloop.last %}
@@ -121,7 +124,7 @@
   ],
   "settings": [
     {
-      "type": "metaobject",
+      "type": "metaobject_list",
       "id": "instagram_list",
       "label": "Instagram List",
       "metaobject_type": "app--279678910465--nn_instagram_list"

@@ -67,33 +67,23 @@ A beautiful, customizable Instagram carousel section for Shopify themes.
 ## Requirements
 
 - Shopify theme
-- App-owned metaobject: `app--279678910465--nn_instagram_list`
-- Instagram metaobjects managed by the NN Instagram app
+- Instagram metaobject with structure:
+  - `Username` (single line text)
+  - `posts` (list of instagram-post metaobjects)
 
 ## Metaobject Structure
 
-### NN Instagram List (Type: `nn_instagram_list`)
+### instagram-list
 
-**App-owned**: `app--279678910465--nn_instagram_list`
+- `Username` - Your Instagram handle
+- `posts` - References to instagram-post entries
 
-This metaobject is created and managed by the NN Instagram app.
-
-- `username` - Your Instagram handle
-- `posts` - References to NN Instagram Post entries
-
-### NN Instagram Post (Type: `nn_instagram_post`)
+### instagram-post
 
 - `images` - Media files (images/videos)
 - `caption` - Post caption text
 - `likes` - Number of likes
 - `comments` - Number of comments
-
-## Setup
-
-1. Install the NN Instagram app from the Shopify App Store
-2. Connect your Instagram account through the app
-3. The app will automatically create the required metaobjects
-4. Add this section to your theme and select the Instagram list from the app
 
 ## Version
 

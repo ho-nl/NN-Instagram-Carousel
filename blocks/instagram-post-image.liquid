@@ -1,4 +1,5 @@
-{% assign post = closest.metaobject['app--279678910465--nn_instagram_post'] %}
+{% assign post = closest.metaobject.nn_instagram_post %}
+{% assign instagram_list = metaobjects.nn_instagram_list['instagram-feed-list'] %}
 
 {% liquid
   assign onboarding = false
@@ -8,10 +9,9 @@
     assign onboarding = true
   endif
 
-  # Try to get username from post's parent list (if available)
-  # This assumes the app sets a username field or reference on the post
-  if post.username.value != blank
-    assign instagram_username = post.username.value
+  # Get username from the nn_instagram_list metaobject
+  if instagram_list.username != blank
+    assign instagram_username = instagram_list.username
   endif
 
   # Get overlay settings from this block
@@ -34,7 +34,7 @@
   {% if onboarding %}
     {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
   {% else %}
-    {% comment %} Get first image/video from images array - WITH .value accessor {% endcomment %}
+    {% comment %} Get first image/video from images array {% endcomment %}
     {% for media in post.images.value limit: 1 %}
       {% if media.sources %}
         {{ media | video_tag: autoplay: true, loop: true, muted: true, class: 'instagram-post-image__video' }}
